@@ -3,8 +3,40 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
+// Fallback games in case Supabase is empty or restricted
+const DEFAULT_GAMES = [
+  {
+    id: '1',
+    title: 'Subway Surfers',
+    category: 'Action',
+    thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500',
+    embedUrl: 'https://html5.gamedistribution.com/rvvAS48/d1170bd7a81d4a66a7b744d0ec504b28/',
+  },
+  {
+    id: '2',
+    title: 'Moto X3M',
+    category: 'Racing',
+    thumbnail: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500',
+    embedUrl: 'https://html5.gamedistribution.com/6e171b3e401844b3aa372993fb1d0ff5/',
+  },
+  {
+    id: '3',
+    title: '2048 Puzzle',
+    category: 'Puzzle',
+    thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500',
+    embedUrl: 'https://play2048.co/',
+  },
+  {
+    id: '4',
+    title: 'Space Shooter 3D',
+    category: '3D',
+    thumbnail: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=500',
+    embedUrl: 'https://html5.gamedistribution.com/a976f30d0fa84ba398eb95085444b0fb/',
+  },
+];
+
 export default function Home() {
-  const [games, setGames] = useState([]);
+  const [games, setGames] = useState(DEFAULT_GAMES);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -19,7 +51,6 @@ export default function Home() {
   const iframeRef = useRef(null);
   const categories = ['All', 'Action', 'Racing', 'Puzzle', '3D'];
 
-  // Theme styling mapping
   const themeStyles = {
     cyberpunk: {
       bg: 'bg-slate-950',
@@ -52,15 +83,17 @@ export default function Home() {
   useEffect(() => {
     async function fetchGames() {
       setLoading(true);
-      const { data, error } = await supabase.from('games').select('*');
-      if (error) {
-        console.error('Error fetching games:', error);
-      } else if (data) {
-        const formattedData = data.map((g) => ({
-          ...g,
-          embedUrl: g.embed_url || g.embedUrl,
-        }));
-        setGames(formattedData);
+      try {
+        const { data, error } = await supabase.from('games').select('*');
+        if (!error && data && data.length > 0) {
+          const formattedData = data.map((g) => ({
+            ...g,
+            embedUrl: g.embed_url || g.embedUrl,
+          }));
+          setGames(formattedData);
+        }
+      } catch (err) {
+        console.error('Failed to fetch from Supabase:', err);
       }
       setLoading(false);
     }
@@ -115,7 +148,7 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen ${currentTheme.bg} text-white font-sans antialiased transition-colors duration-500 relative`}>
-      {/* Drawer Overlay */}
+      {/* Drawer Backdrop */}
       {isSidebarOpen && (
         <div 
           onClick={() => setIsSidebarOpen(false)} 
@@ -123,7 +156,7 @@ export default function Home() {
         />
       )}
 
-      {/* Navigation Sidebar */}
+      {/* Navigation Sidebar Drawer */}
       <aside 
         className={`fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 z-50 p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out shadow-2xl ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -173,7 +206,7 @@ export default function Home() {
 
           <hr className="border-slate-800" />
 
-          {/* Theme Selector */}
+          {/* Theme Switcher */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Color Theme</h3>
             <div className="grid grid-cols-3 gap-2">
@@ -244,9 +277,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Container */}
+      {/* Main Grid */}
       <main className="p-6 max-w-7xl mx-auto">
-        {/* Categories */}
         <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-8 no-scrollbar">
           {categories.map((cat) => (
             <button
@@ -263,7 +295,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Game Cards */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
