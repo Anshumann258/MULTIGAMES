@@ -1,1 +1,1 @@
-The platform to try games and enjoy. 
+A platform to try games and enjoy. 
