@@ -10,9 +10,8 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activeGame, setActiveGame] = useState(null);
   
-  // Navigation & Drawer
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTheme, setActiveTheme] = useState('cyberpunk'); // 'cyberpunk' | 'neon' | 'midnight'
+  const [activeTheme, setActiveTheme] = useState('cyberpunk'); 
 
   const [favorites, setFavorites] = useState([]);
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
@@ -20,35 +19,35 @@ export default function Home() {
   const iframeRef = useRef(null);
   const categories = ['All', 'Action', 'Racing', 'Puzzle', '3D'];
 
-  // Theme configuration
-  const themes = {
+  // Theme styling mapping
+  const themeStyles = {
     cyberpunk: {
       bg: 'bg-slate-950',
-      header: 'bg-slate-900/90 border-purple-500/30',
-      accent: 'from-purple-600 to-indigo-600',
-      glow: 'shadow-purple-500/20',
-      cardBorder: 'hover:border-purple-500/50',
+      header: 'bg-slate-900/90 border-purple-500/30 shadow-purple-950/20',
+      btnActive: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white ring-2 ring-purple-400 shadow-purple-600/40',
+      cardBorder: 'hover:border-purple-500/50 hover:shadow-purple-500/20',
       badge: 'bg-purple-950/80 text-purple-300 border-purple-500/30',
+      accentBtn: 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500',
     },
     neon: {
       bg: 'bg-zinc-950',
-      header: 'bg-zinc-900/90 border-cyan-500/30',
-      accent: 'from-cyan-500 to-blue-600',
-      glow: 'shadow-cyan-500/20',
-      cardBorder: 'hover:border-cyan-500/50',
+      header: 'bg-zinc-900/90 border-cyan-500/30 shadow-cyan-950/20',
+      btnActive: 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white ring-2 ring-cyan-400 shadow-cyan-600/40',
+      cardBorder: 'hover:border-cyan-500/50 hover:shadow-cyan-500/20',
       badge: 'bg-cyan-950/80 text-cyan-300 border-cyan-500/30',
+      accentBtn: 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500',
     },
     midnight: {
       bg: 'bg-gray-950',
-      header: 'bg-gray-900/90 border-emerald-500/30',
-      accent: 'from-emerald-600 to-teal-600',
-      glow: 'shadow-emerald-500/20',
-      cardBorder: 'hover:border-emerald-500/50',
+      header: 'bg-gray-900/90 border-emerald-500/30 shadow-emerald-950/20',
+      btnActive: 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white ring-2 ring-emerald-400 shadow-emerald-600/40',
+      cardBorder: 'hover:border-emerald-500/50 hover:shadow-emerald-500/20',
       badge: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30',
+      accentBtn: 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500',
     },
   };
 
-  const theme = themes[activeTheme] || themes.cyberpunk;
+  const currentTheme = themeStyles[activeTheme] || themeStyles.cyberpunk;
 
   useEffect(() => {
     async function fetchGames() {
@@ -59,7 +58,7 @@ export default function Home() {
       } else if (data) {
         const formattedData = data.map((g) => ({
           ...g,
-          embedUrl: g.embed_url,
+          embedUrl: g.embed_url || g.embedUrl,
         }));
         setGames(formattedData);
       }
@@ -115,8 +114,8 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen ${theme.bg} text-white font-sans antialiased transition-colors duration-500 relative`}>
-      {/* Sidebar Drawer Backdrop */}
+    <div className={`min-h-screen ${currentTheme.bg} text-white font-sans antialiased transition-colors duration-500 relative`}>
+      {/* Drawer Overlay */}
       {isSidebarOpen && (
         <div 
           onClick={() => setIsSidebarOpen(false)} 
@@ -124,7 +123,7 @@ export default function Home() {
         />
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Navigation Sidebar */}
       <aside 
         className={`fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 z-50 p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out shadow-2xl ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -215,9 +214,8 @@ export default function Home() {
       </aside>
 
       {/* Header */}
-      <header className={`sticky top-0 z-40 ${theme.header} backdrop-blur-md border-b px-6 py-4 flex items-center justify-between gap-4 shadow-lg`}>
+      <header className={`sticky top-0 z-40 ${currentTheme.header} backdrop-blur-md border-b px-6 py-4 flex items-center justify-between gap-4 shadow-lg transition-colors duration-500`}>
         <div className="flex items-center gap-4">
-          {/* Hamburger Menu Icon */}
           <button 
             onClick={() => setIsSidebarOpen(true)}
             className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 transition active:scale-95 flex flex-col gap-1 justify-center items-center w-10 h-10"
@@ -235,7 +233,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Search Input */}
         <div className="flex-1 max-w-xs sm:max-w-md">
           <input
             type="text"
@@ -249,7 +246,7 @@ export default function Home() {
 
       {/* Main Container */}
       <main className="p-6 max-w-7xl mx-auto">
-        {/* Category Pills */}
+        {/* Categories */}
         <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-8 no-scrollbar">
           {categories.map((cat) => (
             <button
@@ -257,7 +254,7 @@ export default function Home() {
               onClick={() => setSelectedCategory(cat)}
               className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                 selectedCategory === cat
-                  ? `bg-gradient-to-r ${theme.accent} text-white shadow-lg ring-2 ring-purple-400`
+                  ? currentTheme.btnActive
                   : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700/50'
               }`}
             >
@@ -266,7 +263,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Game Cards Grid */}
+        {/* Game Cards */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -285,9 +282,8 @@ export default function Home() {
                   <div
                     key={game.id}
                     onClick={() => handleOpenGame(game)}
-                    className={`group relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 cursor-pointer transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 shadow-xl hover:${theme.glow} ${theme.cardBorder} flex flex-col`}
+                    className={`group relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 cursor-pointer transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 shadow-xl ${currentTheme.cardBorder} flex flex-col`}
                   >
-                    {/* Thumbnail Image */}
                     <div className="relative h-48 w-full overflow-hidden">
                       <img
                         src={game.thumbnail}
@@ -296,7 +292,6 @@ export default function Home() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                       
-                      {/* Heart Button */}
                       <button
                         onClick={(e) => toggleFavorite(e, game)}
                         className="absolute top-3 right-3 p-2 rounded-full bg-slate-950/70 hover:bg-purple-600 transition-colors duration-200 z-10 border border-slate-700/50"
@@ -304,19 +299,17 @@ export default function Home() {
                         {isFav ? '❤️' : '🤍'}
                       </button>
 
-                      {/* Category Badge */}
-                      <span className={`absolute top-3 left-3 text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-md px-2.5 py-1 rounded-md border ${theme.badge}`}>
+                      <span className={`absolute top-3 left-3 text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-md px-2.5 py-1 rounded-md border ${currentTheme.badge}`}>
                         {game.category}
                       </span>
                     </div>
 
-                    {/* Card Body */}
                     <div className="p-4 flex flex-col justify-between flex-1 bg-slate-900/90">
                       <h3 className="text-base font-bold text-white group-hover:text-purple-400 transition-colors truncate mb-3">
                         {game.title}
                       </h3>
 
-                      <button className={`w-full py-2.5 px-4 rounded-xl bg-gradient-to-r ${theme.accent} text-white text-xs font-bold tracking-wider uppercase shadow-md transition-all duration-300 flex items-center justify-center gap-2 group-hover:brightness-110`}>
+                      <button className={`w-full py-2.5 px-4 rounded-xl ${currentTheme.accentBtn} text-white text-xs font-bold tracking-wider uppercase shadow-md transition-all duration-300 flex items-center justify-center gap-2`}>
                         <span>▶ Play Now</span>
                       </button>
                     </div>
@@ -328,11 +321,10 @@ export default function Home() {
         )}
       </main>
 
-      {/* Game Player Modal */}
+      {/* Game Modal */}
       {activeGame && (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex flex-col justify-center items-center p-4">
           <div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col shadow-2xl">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <span className="text-purple-400">🎮</span> {activeGame.title}
@@ -353,7 +345,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Game iFrame */}
             <div className="relative w-full aspect-video bg-black">
               <iframe
                 ref={iframeRef}
